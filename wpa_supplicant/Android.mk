@@ -1554,6 +1554,39 @@ LOCAL_C_INCLUDES := $(INCLUDES)
 include $(BUILD_EXECUTABLE)
 
 ########################
+ifeq ($(BOARD_WLAN_DEVICE),$(filter $(BOARD_WLAN_DEVICE),WILINK8))
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := wpa_supplicant
+ifneq ($(BOARD_WPA_SUPPLICANT_PRIVATE_LIB_WLINK8),)
+LOCAL_STATIC_LIBRARIES += $(BOARD_WPA_SUPPLICANT_PRIVATE_LIB_WLINK8)
+endif
+ifdef CONFIG_DRIVER_CUSTOM
+LOCAL_STATIC_LIBRARIES := libCustomWifi
+endif
+LOCAL_SHARED_LIBRARIES := libc libcutils liblog
+ifdef CONFIG_EAP_PROXY
+LOCAL_STATIC_LIBRARIES += $(LIB_STATIC_EAP_PROXY)
+LOCAL_SHARED_LIBRARIES += $(LIB_SHARED_EAP_PROXY)
+endif
+ifeq ($(CONFIG_TLS), openssl)
+LOCAL_SHARED_LIBRARIES += libcrypto libssl libkeystore_binder
+endif
+ifdef CONFIG_DRIVER_NL80211
+ifneq ($(wildcard external/libnl),)
+LOCAL_SHARED_LIBRARIES += libnl
+else
+LOCAL_STATIC_LIBRARIES += libnl_2
+endif
+endif
+LOCAL_CFLAGS := $(L_CFLAGS)
+LOCAL_SRC_FILES := $(OBJS)
+LOCAL_C_INCLUDES := $(INCLUDES)
+include $(BUILD_EXECUTABLE)
+
+endif
+
+########################
 
 ifneq ($(BOARD_SUPPORT_BCM_WIFI),)
 
@@ -1591,6 +1624,7 @@ endif
 
 ########################
 
+ifneq ($(BOARD_SUPPORT_RTL_WIFI),)
 include $(CLEAR_VARS)
 LOCAL_MODULE := rtl_wpa_supplicant
 ifdef CONFIG_DRIVER_CUSTOM
@@ -1615,6 +1649,7 @@ LOCAL_CFLAGS += -DFSL_WIFI_VENDOR
 LOCAL_SRC_FILES := $(OBJS)
 LOCAL_C_INCLUDES := $(INCLUDES)
 include $(BUILD_EXECUTABLE)
+endif
 
 ########################
 #
@@ -1633,6 +1668,16 @@ include $(BUILD_EXECUTABLE)
 ifeq ($(WPA_SUPPLICANT_VERSION),$(filter $(WPA_SUPPLICANT_VERSION),VER_0_8_UNITE))
 local_target_dir := $(TARGET_OUT)/etc/wifi
 
+include $(CLEAR_VARS)
+LOCAL_MODULE := wpa_supplicant.conf
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE_PATH := $(local_target_dir)
+LOCAL_SRC_FILES := $(LOCAL_MODULE)
+include $(BUILD_PREBUILT)
+endif
+
+ifeq ($(WPA_SUPPLICANT_VERSION),$(filter $(WPA_SUPPLICANT_VERSION),VER_0_8_X))
+local_target_dir := $(TARGET_OUT)/etc/wifi
 include $(CLEAR_VARS)
 LOCAL_MODULE := wpa_supplicant.conf
 LOCAL_MODULE_CLASS := ETC
