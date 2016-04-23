@@ -913,6 +913,8 @@ LOCAL_C_INCLUDES := $(INCLUDES)
 include $(BUILD_EXECUTABLE)
 
 ########################
+ifneq ($(BOARD_SUPPORT_BCM_WIFI),)
+
 include $(CLEAR_VARS)
 LOCAL_MODULE := hostapd
 LOCAL_MODULE_TAGS := optional
@@ -933,9 +935,12 @@ LOCAL_SRC_FILES := $(OBJS)
 LOCAL_C_INCLUDES := $(INCLUDES)
 include $(BUILD_EXECUTABLE)
 
+endif
+
 ########################
 
 ########################
+ifneq ($(BOARD_SUPPORT_RTL_WIFI),)
 include $(CLEAR_VARS)
 LOCAL_MODULE := rtl_hostapd
 LOCAL_MODULE_TAGS := optional
@@ -956,5 +961,7 @@ LOCAL_CFLAGS += -DREALTEK_WIFI_VENDOR
 LOCAL_SRC_FILES := $(OBJS)
 LOCAL_C_INCLUDES := $(INCLUDES)
 include $(BUILD_EXECUTABLE)
+endif
+
 
 endif # ifeq ($(WPA_BUILD_HOSTAPD),true)
