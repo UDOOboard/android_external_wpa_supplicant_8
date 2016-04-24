@@ -1544,6 +1544,7 @@ LOCAL_SRC_FILES := $(OBJS_c)
 LOCAL_C_INCLUDES := $(INCLUDES)
 include $(BUILD_EXECUTABLE)
 
+########################
 ifeq ($(BOARD_WLAN_DEVICE),$(filter $(BOARD_WLAN_DEVICE),rt5370))
 
 include $(CLEAR_VARS)
@@ -1577,17 +1578,17 @@ include $(BUILD_EXECUTABLE)
 endif
 
 ########################
+
 ########################
-ifeq ($(BOARD_WLAN_DEVICE),$(filter $(BOARD_WLAN_DEVICE),rt5370))
+ifeq ($(BOARD_WLAN_DEVICE),$(filter $(BOARD_WLAN_DEVICE),WILINK8))
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := wpa_supplicant
+ifneq ($(BOARD_WPA_SUPPLICANT_PRIVATE_LIB_WLINK8),)
+LOCAL_STATIC_LIBRARIES += $(BOARD_WPA_SUPPLICANT_PRIVATE_LIB_WLINK8)
+endif
 ifdef CONFIG_DRIVER_CUSTOM
 LOCAL_STATIC_LIBRARIES := libCustomWifi
-endif
-LOCAL_STATIC_LIBRARIES += lib_driver_cmd_bcmdhd
-ifneq ($(BOARD_WPA_SUPPLICANT_PRIVATE_LIB_BCM),)
-LOCAL_STATIC_LIBRARIES += $(BOARD_WPA_SUPPLICANT_PRIVATE_LIB_BCM)
 endif
 LOCAL_SHARED_LIBRARIES := libc libcutils liblog
 ifdef CONFIG_EAP_PROXY
@@ -1612,7 +1613,6 @@ LOCAL_STATIC_LIBRARIES += libnl_2
 endif
 endif
 LOCAL_CFLAGS := $(L_CFLAGS)
-LOCAL_CFLAGS += -DBROADCOM_WIFI_VENDOR
 LOCAL_SRC_FILES := $(OBJS)
 LOCAL_C_INCLUDES := $(INCLUDES)
 include $(BUILD_EXECUTABLE)
@@ -1665,7 +1665,9 @@ LOCAL_MODULE := rtl_wpa_supplicant
 ifdef CONFIG_DRIVER_CUSTOM
 LOCAL_STATIC_LIBRARIES := libCustomWifi
 endif
-LOCAL_STATIC_LIBRARIES += lib_driver_cmd_rtl
+ifneq ($(BOARD_WPA_SUPPLICANT_PRIVATE_LIB_RTL),)
+LOCAL_STATIC_LIBRARIES += $(BOARD_WPA_SUPPLICANT_PRIVATE_LIB_RTL)
+endif
 LOCAL_SHARED_LIBRARIES := libc libcutils liblog
 ifeq ($(CONFIG_TLS), openssl)
 LOCAL_SHARED_LIBRARIES += libcrypto libssl libkeystore_binder
@@ -1685,6 +1687,7 @@ LOCAL_STATIC_LIBRARIES += libnl_2
 endif
 endif
 LOCAL_CFLAGS := $(L_CFLAGS)
+LOCAL_CFLAGS += -DFSL_WIFI_VENDOR
 LOCAL_SRC_FILES := $(OBJS)
 LOCAL_C_INCLUDES := $(INCLUDES)
 include $(BUILD_EXECUTABLE)
@@ -1707,6 +1710,16 @@ endif
 ifeq ($(WPA_SUPPLICANT_VERSION),$(filter $(WPA_SUPPLICANT_VERSION),VER_0_8_UNITE))
 local_target_dir := $(TARGET_OUT)/etc/wifi
 
+include $(CLEAR_VARS)
+LOCAL_MODULE := wpa_supplicant.conf
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE_PATH := $(local_target_dir)
+LOCAL_SRC_FILES := $(LOCAL_MODULE)
+include $(BUILD_PREBUILT)
+endif
+
+ifeq ($(WPA_SUPPLICANT_VERSION),$(filter $(WPA_SUPPLICANT_VERSION),VER_0_8_X))
+local_target_dir := $(TARGET_OUT)/etc/wifi
 include $(CLEAR_VARS)
 LOCAL_MODULE := wpa_supplicant.conf
 LOCAL_MODULE_CLASS := ETC
