@@ -3270,7 +3270,9 @@ static int wpas_p2p_setup_channels(struct wpa_supplicant *wpa_s,
 	cla = cli_cla = 0;
 
 	for (op = 0; op_class[op].op_class; op++) {
-		const struct p2p_oper_class_map *o = &op_class[op];
+		struct p2p_oper_class_map *o = &op_class[op];
+        if (o->op_class != 81)
+                continue;
 		u8 ch;
 		struct p2p_reg_class *reg = NULL, *cli_reg = NULL;
 
@@ -5526,7 +5528,7 @@ int wpas_p2p_group_add_persistent(struct wpa_supplicant *wpa_s,
 				  int connection_timeout)
 {
 	struct p2p_go_neg_results params;
-	int go = 0, freq;
+	int go = 0, freq = 2;
 
 	if (ssid->disabled != 2 || ssid->ssid == NULL)
 		return -1;
